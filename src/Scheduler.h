@@ -18,6 +18,8 @@ class Scheduler : public cSimpleModule {
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void executeLowQueue();
+    virtual void executeHighQueue();
 };
 
 #endif
