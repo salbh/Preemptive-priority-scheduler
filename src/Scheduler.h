@@ -15,6 +15,9 @@ class Scheduler : public cSimpleModule {
     std::queue <Job*> lowPriorityQueue;
     std::queue <Job*> highPriorityQueue;
 
+    Job * pendingLowPriorityJob;
+    Job * pendingHighPriorityJob;
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
