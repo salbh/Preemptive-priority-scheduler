@@ -3,51 +3,71 @@
 Define_Module(Scheduler);
 
 void Scheduler::initialize() {
-    genTimeSignal_ = registerSignal("genTimeSignal");
-    lastSeen_ = 0;
-    pendingLowPriorityJob = null;
-    pendingHighPriorityJob = null;
+    processingTimerLow_ = new cMessage("processingTimerLow");
+    processingTimerHigh_ = new cMessage("processingTimerHigh");
+
+    logger = par("logger");
+
 }
 
-void Scheduler::handleMessage(Job *msg) {
-    msg->queueArrival = simTime();
-        if(msg->priority_)
-            highPriorityQueue.push(msg);
-        else lowPriorityQueue.push(msg);
-
-        if(highPriorityQueue.size() != 0)
-            executeHighQueue();
-        executeLowQueue();
-}
-
-
-void Scheduler::executeLowQueue()
-{
-    //processa i messaggi nella low priority queue finchè la hpq è vuota e basta
-    if(pendingLowPriorityJob == null)
-    {
-        pendingLowPriorityJob = lowPriorityQueue.pop();
-        pendingLowPriorityJob->serviceTime = simTime();
+void Scheduler::handleMessage(cMessage *msg) {
+    if (msg->isSelfMessage()) {
+        if (logger) {
+            EV << "scheduler: Job processed at time: " << simTime() << " with name: " << msg->getName() << endl;
+        }
+        if (strcmp(msg->getName(), "processingTimerHigh") == 0) {
+            removeHighJob();
+        } else {
+            removeLowJob();
+        }
+    } else {
+        Job* job = check_and_cast<Job*>(msg);
+        job->setQueueArrival(simTime());
+        if (logger) {
+            EV << "scheduler: Job arrived at time: " << job->getQueueArrival() << endl;
+            EV << "scheduler: Job service time: " << job->getServiceTime() << endl;
+        }
+        if (job->getIsHighPriority()) {
+            highPriorityQueue.push(job);
+        } else {
+            lowPriorityQueue.push(job);
+        }
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+        if (highPriorityQueue.size() == 1) {
+            processHighJob();
+        }
+        if (highPriorityQueue.empty() && lowPriorityQueue.size() == 1) {
+            processLowJob();
+        }
     }
-    //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job e se viene interrotta riprende da capo)
-
-    //elimina il messaggio una volta che è eseguito, non so se basta una o ci vogliono tutte e due queste linee di codice, nel dubbio le ho messe entrambe
-    delete(pendingLowPriorityJob);
-    pendingLowPriorityJob = null;
 }
 
-void Scheduler::executeHighQueue()
-{
-    //esaurisce tutta la highpriorityqueue finchè non è vuota
-    if(pendingHighPriorityJob == null)
-    {
-        pendingHighPriorityJob = highPriorityQueue.pop();
-        pendingHighPriorityJob->serviceTime = simTime();
+
+void Scheduler::processLowJob(){
+    Job* job = lowPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerLow_);
+}
+
+void Scheduler::processHighJob(){
+    Job* job = highPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerHigh_);
+}
+
+void Scheduler::removeHighJob(){
+    highPriorityQueue.pop();
+    if (logger) {
+        EV << "scheduler: High priority job removed" << endl;
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
     }
-    //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job senza interruzioni (sapete mica se handle message blocca le altre funzioni?))
+}
 
-    //elimina il messaggio una volta che è eseguito, non so se basta una o ci vogliono tutte e due queste linee di codice, nel dubbio le ho messe entrambe
-    delete(pendingHighPriorityJob);
-    pendingHighPriorityJob = null;
-
+void Scheduler::removeLowJob(){
+    lowPriorityQueue.pop();
+    if (logger) {
+        EV << "scheduler: Low priority job removed" << endl;
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    }
 }

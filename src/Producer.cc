@@ -21,7 +21,7 @@ void Producer::initialize() {
         if (arrivalDistribution == 0) {
             EV << getName() << ": Constant interarrival times" << endl;
         } else {
-            EV << getName() << ": Exponential distribution of the interarrival times" << endl;
+            EV << getName() << ": Exponential distribution of the interarrival t3imes" << endl;
         }
         if (serviceDistribution == 0) {
             EV << getName() << ": Constant service times" << endl;
@@ -45,9 +45,6 @@ void Producer::scheduleNextArrival() {
     } else {
         arrivalTime = exponential(arrivalMean, AT_RNG);
     }
-    if (logger) {
-        EV << getName() << ": next job will arrive in " << arrivalTime << " seconds" << endl;
-    }
     scheduleAt(simTime() + arrivalTime, timer_);
 }
 
@@ -58,7 +55,7 @@ void Producer::sendJob() {
     } else {
         job->setServiceTime(exponential(serviceMean, ST_RNG));
     }
-    if (getName() == "producerLow") {
+    if (strcmp(getName(),"producerLow") == 0) {
         job->setIsHighPriority(false);
     } else {
         job->setIsHighPriority(true);

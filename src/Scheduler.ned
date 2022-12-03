@@ -4,8 +4,7 @@ package ppscheduler;
 simple Scheduler
 {
     parameters:
-    	@signal[genTimeSignal];
-        @statistic[genTime](source="genTimeSignal"; record=mean,vector);
+    	bool logger = default(false);
     gates:
         input queuesIn[];
 }
