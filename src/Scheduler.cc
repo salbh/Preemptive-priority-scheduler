@@ -3,6 +3,10 @@
 Define_Module(Scheduler);
 
 void Scheduler::initialize() {
+    processingTimerLow_ = new cMessage("processingTimerLow");
+    processingTimerHigh_ = new cMessage("processingTimerHigh");
+
+    logger = par("logger");
     genTimeSignal_ = registerSignal("genTimeSignal");
     lastSeen_ = 0;
     pendingLowPriorityJob = null;
@@ -15,7 +19,7 @@ void Scheduler::handleMessage(Job *msg) {
             highPriorityQueue.push(msg);
         else lowPriorityQueue.push(msg);
 
-        if(highPriorityQueue.size() != 0)
+        if(highPriorityQueue.size() != 0 || pendingHighPriorityJob != null)
             executeHighQueue();
         executeLowQueue();
 }
@@ -27,10 +31,10 @@ void Scheduler::executeLowQueue()
     if(pendingLowPriorityJob == null)
     {
         pendingLowPriorityJob = lowPriorityQueue.pop();
-        pendingLowPriorityJob->serviceTime = simTime();
+        pendingLowPriorityJob->processingTime = simTime();
     }
     //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job e se viene interrotta riprende da capo)
-
+    //processLowJob(pendingLowPriorityJob);
     //elimina il messaggio una volta che è eseguito, non so se basta una o ci vogliono tutte e due queste linee di codice, nel dubbio le ho messe entrambe
     delete(pendingLowPriorityJob);
     pendingLowPriorityJob = null;
@@ -42,7 +46,7 @@ void Scheduler::executeHighQueue()
     if(pendingHighPriorityJob == null)
     {
         pendingHighPriorityJob = highPriorityQueue.pop();
-        pendingHighPriorityJob->serviceTime = simTime();
+        pendingHighPriorityJob->processingTime = simTime();
     }
     //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job senza interruzioni (sapete mica se handle message blocca le altre funzioni?))
 
@@ -50,4 +54,14 @@ void Scheduler::executeHighQueue()
     delete(pendingHighPriorityJob);
     pendingHighPriorityJob = null;
 
+}
+
+void Scheduler::processLowJob(){
+    Job* job = lowPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerLow_);
+}
+
+void Scheduler::processHighJob(){
+    Job* job = highPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerHigh_);
 }
