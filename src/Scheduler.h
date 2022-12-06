@@ -23,6 +23,11 @@ class Scheduler : public cSimpleModule {
     virtual void handleMessage(cMessage *msg);
     virtual void executeLowQueue();
     virtual void executeHighQueue();
+    void processLowJob(Job * job);
+    void processHighJob(Job * job);
+    void deleteLowJob();
+    void deleteHighJob();
+    void finish();
 };
 
 #endif

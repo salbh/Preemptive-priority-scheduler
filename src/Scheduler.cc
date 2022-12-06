@@ -14,16 +14,65 @@ void Scheduler::initialize() {
 }
 
 void Scheduler::handleMessage(Job *msg) {
-    msg->queueArrival = simTime();
-        if(msg->priority_)
-            highPriorityQueue.push(msg);
-        else lowPriorityQueue.push(msg);
+    if (msg->isSelfMessage()) {
+           if (logger) {
+               EV << "scheduler: Job processed at time: " << simTime() << " with name: " << msg->getName() << endl;
+           }
+           if (strcmp(msg->getName(), "processingTimerHigh") == 0) {
+               removeHighJob();
+           } else {
+               removeLowJob();
+           }
+           if(highPriorityQueue.size() != 0)
+               executeHighQueue();
+           executeLowQueue();
+    }
+    else
+    {
+        msg->queueArrival = simTime();
+            if(msg->priority_)
+            {
+                cancelEvent(processingTimerLow_);
+                highPriorityQueue.push(msg);
+            }
+            else lowPriorityQueue.push(msg);
 
-        if(highPriorityQueue.size() != 0 || pendingHighPriorityJob != null)
-            executeHighQueue();
-        executeLowQueue();
+            if(highPriorityQueue.size() != 0 || pendingHighPriorityJob != null)
+                executeHighQueue();
+            executeLowQueue();
+    }
 }
 
+
+void Scheduler::processLowJob(Job * job){
+    //Job* job = lowPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerLow_);
+}
+
+void Scheduler::processHighJob(Job * job){
+    //Job* job = highPriorityQueue.front();
+    scheduleAt(simTime() + job->getServiceTime(), processingTimerHigh_);
+}
+
+void Scheduler::removeHighJob(){
+    delete(pendingHighPriorityJob);
+    pendingHighPriorityJob = null;
+    if (logger) {
+        EV << "scheduler: High priority job removed" << endl;
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    }
+}
+
+void Scheduler::removeLowJob(){
+    delete(pendingLowPriorityJob);
+    pendingLowPriorityJob = null;
+    if (logger) {
+        EV << "scheduler: Low priority job removed" << endl;
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    }
+}
 
 void Scheduler::executeLowQueue()
 {
@@ -33,11 +82,7 @@ void Scheduler::executeLowQueue()
         pendingLowPriorityJob = lowPriorityQueue.pop();
         pendingLowPriorityJob->processingTime = simTime();
     }
-    //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job e se viene interrotta riprende da capo)
-    //processLowJob(pendingLowPriorityJob);
-    //elimina il messaggio una volta che è eseguito, non so se basta una o ci vogliono tutte e due queste linee di codice, nel dubbio le ho messe entrambe
-    delete(pendingLowPriorityJob);
-    pendingLowPriorityJob = null;
+    processLowJob(pendingLowPriorityJob);
 }
 
 void Scheduler::executeHighQueue()
@@ -48,20 +93,16 @@ void Scheduler::executeHighQueue()
         pendingHighPriorityJob = highPriorityQueue.pop();
         pendingHighPriorityJob->processingTime = simTime();
     }
-    //TODO: esegue il job (in questo caso penso che serva una funzione che "esegue" il job senza interruzioni (sapete mica se handle message blocca le altre funzioni?))
-
-    //elimina il messaggio una volta che è eseguito, non so se basta una o ci vogliono tutte e due queste linee di codice, nel dubbio le ho messe entrambe
-    delete(pendingHighPriorityJob);
-    pendingHighPriorityJob = null;
-
+    processHighJob(pendingHighPriorityJob);
 }
 
-void Scheduler::processLowJob(){
-    Job* job = lowPriorityQueue.front();
-    scheduleAt(simTime() + job->getServiceTime(), processingTimerLow_);
+void Scheduler::finish()
+{
+    while(!highPriorityQueue.empty()) highPriorityQueue.pop();
+    while(!lowPriorityQueue.empty()) lowPriorityQueue.pop();
+    if(pendingHighPriorityJob != null) removeHighJob();
+    if(pendingLowPriorityJob != null) removeLowJob();
+    delete(processingTimerLow_);
+    delete(processingTimerHigh_);
 }
 
-void Scheduler::processHighJob(){
-    Job* job = highPriorityQueue.front();
-    scheduleAt(simTime() + job->getServiceTime(), processingTimerHigh_);
-}
