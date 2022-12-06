@@ -20,6 +20,11 @@ void Scheduler::handleMessage(cMessage *msg) {
         } else {
             removeLowJob();
         }
+        if (!highPriorityQueue.empty()) {
+            processHighJob();
+        } else if (!lowPriorityQueue.empty()) {
+            processLowJob();
+        }
     } else {
         Job* job = check_and_cast<Job*>(msg);
         job->setQueueArrival(simTime());
@@ -28,6 +33,9 @@ void Scheduler::handleMessage(cMessage *msg) {
             EV << "scheduler: Job service time: " << job->getServiceTime() << endl;
         }
         if (job->getIsHighPriority()) {
+            if (!lowPriorityQueue.empty()) {
+                cancelEvent(processingTimerLow_);
+            }
             highPriorityQueue.push(job);
         } else {
             lowPriorityQueue.push(job);
@@ -45,13 +53,13 @@ void Scheduler::handleMessage(cMessage *msg) {
 
 
 void Scheduler::processLowJob(){
-    Job* job = lowPriorityQueue.front();
-    scheduleAt(simTime() + job->getServiceTime(), processingTimerLow_);
+    lowPriorityJob = lowPriorityQueue.front();
+    scheduleAt(simTime() + lowPriorityJob->getServiceTime(), processingTimerLow_);
 }
 
 void Scheduler::processHighJob(){
-    Job* job = highPriorityQueue.front();
-    scheduleAt(simTime() + job->getServiceTime(), processingTimerHigh_);
+    highPriorityJob = highPriorityQueue.front();
+    scheduleAt(simTime() + highPriorityJob->getServiceTime(), processingTimerHigh_);
 }
 
 void Scheduler::removeHighJob(){
@@ -61,6 +69,7 @@ void Scheduler::removeHighJob(){
         EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
         EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
     }
+    delete(highPriorityJob);
 }
 
 void Scheduler::removeLowJob(){
@@ -70,4 +79,5 @@ void Scheduler::removeLowJob(){
         EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
         EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
     }
+    delete(lowPriorityJob);
 }

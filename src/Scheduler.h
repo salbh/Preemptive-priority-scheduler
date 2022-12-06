@@ -14,6 +14,8 @@ class Scheduler : public cSimpleModule {
 
     std::queue <Job*> lowPriorityQueue;
     std::queue <Job*> highPriorityQueue;
+    Job* lowPriorityJob;
+    Job* highPriorityJob;
 
     cMessage* processingTimerLow_;
     cMessage* processingTimerHigh_;
