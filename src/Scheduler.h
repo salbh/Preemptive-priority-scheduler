@@ -18,15 +18,24 @@ class Scheduler : public cSimpleModule {
     Job * pendingLowPriorityJob;
     Job * pendingHighPriorityJob;
 
+    cMessage* processingTimerLow_;
+    cMessage* processingTimerHigh_;
+
+    bool highIsWaiting;
+    bool lowIsWaiting;
+
+    bool logger = false;
+
+    void processLowJob(Job * job);
+    void processHighJob(Job * job);
+    void removeLowJob();
+    void removeHighJob();
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void executeLowQueue();
     virtual void executeHighQueue();
-    void processLowJob(Job * job);
-    void processHighJob(Job * job);
-    void deleteLowJob();
-    void deleteHighJob();
     void finish();
 };
 

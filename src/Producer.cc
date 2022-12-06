@@ -58,7 +58,7 @@ void Producer::sendJob() {
     } else {
         job->setServiceTime(exponential(serviceMean, ST_RNG));
     }
-    if (getName() == "producerLow") {
+    if (strcmp(getName(),"producerLow") == 0) {
         job->setIsHighPriority(false);
     } else {
         job->setIsHighPriority(true);
