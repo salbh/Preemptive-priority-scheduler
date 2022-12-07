@@ -66,5 +66,10 @@ void Producer::sendJob() {
     }
 }
 
+void Producer::finish() {
+    cancelAndDelete(timer_);
+    cSimpleModule::finish();
+}
+
 
 

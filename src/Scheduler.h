@@ -20,15 +20,21 @@ class Scheduler : public cSimpleModule {
     cMessage* processingTimerLow_;
     cMessage* processingTimerHigh_;
 
-    bool logger = false;
+    bool logger;
+
+    bool highWait;
+    bool lowWait;
 
     void processLowJob();
     void processHighJob();
     void removeHighJob();
     void removeLowJob();
+    void cleanMemory();
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void finish();
 };
 
 #endif
