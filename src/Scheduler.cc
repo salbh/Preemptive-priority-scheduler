@@ -94,14 +94,11 @@ void Scheduler::finish() {
         EV << "scheduler: " << "High Priority Queue size: " << highPriorityQueue.size() << endl;
         EV << "scheduler: " << "Low Priority Queue size: " << lowPriorityQueue.size() << endl;
     }
+    cSimpleModule::finish();
 }
 
 void Scheduler::cleanMemory(){
     EV << "Calling destructor" << endl;
-    lowPriorityJob = nullptr;
-    highPriorityJob = nullptr;
-    delete(lowPriorityJob);
-    delete(highPriorityJob);
 
     cancelAndDelete(processingTimerLow_);
     cancelAndDelete(processingTimerHigh_);
