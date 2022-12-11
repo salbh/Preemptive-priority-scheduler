@@ -21,7 +21,7 @@ void Producer::initialize() {
         if (arrivalDistribution == 0) {
             EV << getName() << ": Constant interarrival times" << endl;
         } else {
-            EV << getName() << ": Exponential distribution of the interarrival t3imes" << endl;
+            EV << getName() << ": Exponential distribution of the interarrival times" << endl;
         }
         if (serviceDistribution == 0) {
             EV << getName() << ": Constant service times" << endl;

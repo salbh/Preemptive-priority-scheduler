@@ -38,6 +38,7 @@ void Scheduler::handleMessage(cMessage *msg) {
         if (job->getIsHighPriority()) {
             if (!lowPriorityQueue.empty()) {
                 cancelEvent(processingTimerLow_);
+                lowWait = false;
             }
             highPriorityQueue.push(job);
         } else {
