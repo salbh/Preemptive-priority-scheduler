@@ -56,19 +56,20 @@ void Producer::sendJob() {
         job->setServiceTime(serviceMean);
     }
     if (strcmp(getName(),"producerLow") == 0) {
-        job->setIsHighPriority(false);
-        if(serviceDistribution != 0) {
-            job->setServiceTime(exponential(serviceMean, ST_LOW_RNG));
-        }
+        setJob(job, false, ST_LOW_RNG);
     } else {
-        job->setIsHighPriority(true);
-        if(serviceDistribution != 0) {
-            job->setServiceTime(exponential(serviceMean, ST_HIGH_RNG));
-        }
+        setJob(job, true, ST_HIGH_RNG);
     }
     send(job, "out");
     if (logger) {
         EV << getName() << ": new job with Service Time = " << job->getServiceTime() << " sent" << endl;
+    }
+}
+
+void Producer::setJob(Job *job, bool priority, const int RNG) {
+    job->setIsHighPriority(priority);
+    if(serviceDistribution != 0) {
+        job->setServiceTime(exponential(serviceMean, RNG));
     }
 }
 

@@ -2,6 +2,7 @@
 #define __PPSCHEDULER_PRODUCER_H_
 
 #include <omnetpp.h>
+#include "Job_m.h"
 
 #define AT_LOW_RNG 0
 #define ST_LOW_RNG 1
@@ -25,6 +26,7 @@ class Producer : public cSimpleModule {
 
     void scheduleNextArrival();
     void sendJob();
+    void setJob(Job *job, bool priority, const int RNG);
 
   protected:
     virtual void initialize();
