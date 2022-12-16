@@ -42,8 +42,10 @@ void Producer::scheduleNextArrival() {
     simtime_t arrivalTime;
     if (arrivalDistribution == 0) {
         arrivalTime = arrivalMean;
+    } else if (strcmp(getName(),"producerLow") == 0) {
+        arrivalTime = exponential(arrivalMean, AT_LOW_RNG);
     } else {
-        arrivalTime = exponential(arrivalMean, AT_RNG);
+        arrivalTime = exponential(arrivalMean, AT_HIGH_RNG);
     }
     scheduleAt(simTime() + arrivalTime, timer_);
 }
@@ -52,13 +54,17 @@ void Producer::sendJob() {
     Job* job = new Job();
     if (serviceDistribution == 0) {
         job->setServiceTime(serviceMean);
-    } else {
-        job->setServiceTime(exponential(serviceMean, ST_RNG));
     }
     if (strcmp(getName(),"producerLow") == 0) {
         job->setIsHighPriority(false);
+        if(serviceDistribution != 0) {
+            job->setServiceTime(exponential(serviceMean, ST_LOW_RNG));
+        }
     } else {
         job->setIsHighPriority(true);
+        if(serviceDistribution != 0) {
+            job->setServiceTime(exponential(serviceMean, ST_HIGH_RNG));
+        }
     }
     send(job, "out");
     if (logger) {

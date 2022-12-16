@@ -3,8 +3,10 @@
 
 #include <omnetpp.h>
 
-#define AT_RNG 0
-#define ST_RNG 1
+#define AT_LOW_RNG 0
+#define ST_LOW_RNG 1
+#define AT_HIGH_RNG 2
+#define ST_HIGH_RNG 3
 
 using namespace omnetpp;
 
