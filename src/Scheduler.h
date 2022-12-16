@@ -26,7 +26,7 @@ class Scheduler : public cSimpleModule {
     bool lowWait;
 
     void handleTimer(cMessage *msg);
-    void handleJob(Job *job);
+    void handleJob(cMessage *msg);
     void processLowJob();
     void processHighJob();
     void removeHighJob();
