@@ -1,0 +1,8 @@
+
+out/gcc-release/src/.last-copts
+*.o
+*.d
+out/gcc-release/src/Preemptive-priority-scheduler
+.settings/language.settings.xml
+.settings/language.settings.xml
+simulations/.qtenvrc

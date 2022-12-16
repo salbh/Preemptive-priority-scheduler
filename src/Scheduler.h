@@ -14,15 +14,27 @@ class Scheduler : public cSimpleModule {
 
     std::queue <Job*> lowPriorityQueue;
     std::queue <Job*> highPriorityQueue;
+    Job* lowPriorityJob;
+    Job* highPriorityJob;
 
-    Job * pendingLowPriorityJob;
-    Job * pendingHighPriorityJob;
+    cMessage* processingTimerLow_;
+    cMessage* processingTimerHigh_;
+
+    bool logger;
+
+    bool highWait;
+    bool lowWait;
+
+    void processLowJob();
+    void processHighJob();
+    void removeHighJob();
+    void removeLowJob();
+    void cleanMemory();
 
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
-    virtual void executeLowQueue();
-    virtual void executeHighQueue();
+    virtual void finish();
 };
 
 #endif

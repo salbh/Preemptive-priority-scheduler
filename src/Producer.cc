@@ -42,11 +42,10 @@ void Producer::scheduleNextArrival() {
     simtime_t arrivalTime;
     if (arrivalDistribution == 0) {
         arrivalTime = arrivalMean;
+    } else if (strcmp(getName(),"producerLow") == 0) {
+        arrivalTime = exponential(arrivalMean, AT_LOW_RNG);
     } else {
-        arrivalTime = exponential(arrivalMean, AT_RNG);
-    }
-    if (logger) {
-        EV << getName() << ": next job will arrive in " << arrivalTime << " seconds" << endl;
+        arrivalTime = exponential(arrivalMean, AT_HIGH_RNG);
     }
     scheduleAt(simTime() + arrivalTime, timer_);
 }
@@ -55,18 +54,28 @@ void Producer::sendJob() {
     Job* job = new Job();
     if (serviceDistribution == 0) {
         job->setServiceTime(serviceMean);
-    } else {
-        job->setServiceTime(exponential(serviceMean, ST_RNG));
     }
-    if (getName() == "producerLow") {
-        job->setIsHighPriority(false);
+    if (strcmp(getName(),"producerLow") == 0) {
+        setJob(job, false, ST_LOW_RNG);
     } else {
-        job->setIsHighPriority(true);
+        setJob(job, true, ST_HIGH_RNG);
     }
     send(job, "out");
     if (logger) {
         EV << getName() << ": new job with Service Time = " << job->getServiceTime() << " sent" << endl;
     }
+}
+
+void Producer::setJob(Job *job, bool priority, const int RNG) {
+    job->setIsHighPriority(priority);
+    if(serviceDistribution != 0) {
+        job->setServiceTime(exponential(serviceMean, RNG));
+    }
+}
+
+void Producer::finish() {
+    cancelAndDelete(timer_);
+    cSimpleModule::finish();
 }
 
 
