@@ -16,18 +16,7 @@ void Scheduler::handleMessage(cMessage *msg) {
         if (logger) {
             EV << "scheduler: Job processed at time: " << simTime() << " with name: " << msg->getName() << endl;
         }
-        if (strcmp(msg->getName(), "processingTimerHigh") == 0) {
-            highWait = false;
-            removeHighJob();
-        } else {
-            lowWait = false;
-            removeLowJob();
-        }
-        if (!highPriorityQueue.empty() && highWait == false) {
-            processHighJob();
-        } else if (!lowPriorityQueue.empty() && lowWait == false) {
-            processLowJob();
-        }
+        handleTimer(msg);
     } else {
         Job* job = check_and_cast<Job*>(msg);
         job->setQueueArrival(simTime());
@@ -35,26 +24,44 @@ void Scheduler::handleMessage(cMessage *msg) {
             EV << "scheduler: Job arrived at time: " << job->getQueueArrival() << endl;
             EV << "scheduler: Job service time: " << job->getServiceTime() << endl;
         }
-        if (job->getIsHighPriority()) {
-            if (!lowPriorityQueue.empty()) {
-                cancelEvent(processingTimerLow_);
-                lowWait = false;
-            }
-            highPriorityQueue.push(job);
-        } else {
-            lowPriorityQueue.push(job);
-        }
-        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
-        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
-        if (highPriorityQueue.size() == 1 && highWait == false) {
-            processHighJob();
-        }
-        if (highPriorityQueue.empty() && lowPriorityQueue.size() == 1 && lowWait == false) {
-            processLowJob();
-        }
+        handleJob(job);
     }
 }
 
+void Scheduler::handleTimer(cMessage *msg) {
+    if (strcmp(msg->getName(), "processingTimerHigh") == 0) {
+        highWait = false;
+        removeHighJob();
+    } else {
+        lowWait = false;
+        removeLowJob();
+    }
+    if (!highPriorityQueue.empty() && highWait == false) {
+        processHighJob();
+    } else if (!lowPriorityQueue.empty() && lowWait == false) {
+        processLowJob();
+    }
+}
+
+void Scheduler::handleJob(Job *job) {
+    if (job->getIsHighPriority()) {
+        if (!lowPriorityQueue.empty()) {
+            cancelEvent(processingTimerLow_);
+            lowWait = false;
+        }
+        highPriorityQueue.push(job);
+    } else {
+        lowPriorityQueue.push(job);
+    }
+    EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+    EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    if (highPriorityQueue.size() == 1 && highWait == false) {
+        processHighJob();
+    }
+    if (highPriorityQueue.empty() && lowPriorityQueue.size() == 1 && lowWait == false) {
+        processLowJob();
+    }
+}
 
 void Scheduler::processLowJob(){
     lowPriorityJob = lowPriorityQueue.front();
