@@ -53,8 +53,10 @@ void Scheduler::handleJob(Job *job) {
     } else {
         lowPriorityQueue.push(job);
     }
-    EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
-    EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    if (logger) {
+        EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
+        EV << "scheduler: High Priority Queue Size: " << highPriorityQueue.size() << endl;
+    }
     if (highPriorityQueue.size() == 1 && highWait == false) {
         processHighJob();
     }
@@ -106,7 +108,9 @@ void Scheduler::finish() {
 }
 
 void Scheduler::cleanMemory(){
-    EV << "Calling destructor" << endl;
+    if (logger) {
+        EV << "Calling destructor" << endl;
+    }
 
     cancelAndDelete(processingTimerLow_);
     cancelAndDelete(processingTimerHigh_);
