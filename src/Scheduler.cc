@@ -9,6 +9,9 @@ void Scheduler::initialize() {
     highWait = false;
     lowWait = false;
     logger = par("logger");
+
+    jobs_num_signal = registerSignal("jobs_num");
+    response_time_signal = registerSignal("response_time");
 }
 
 void Scheduler::handleMessage(cMessage *msg) {
