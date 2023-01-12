@@ -6,11 +6,17 @@ simple Scheduler
     parameters:
     	bool logger = default(false);
     	
-    	@signal [jobs_num];
-        @statistic [jobs_num_stat] (source="jobs_num"; record=vector);
+    	@signal [low_jobs_num];
+        @statistic [low_jobs_num_stat] (source="low_jobs_num"; record=vector);
     	
-    	@signal [response_time];
-        @statistic [response_time_stat] (source="response_time"; record=mean, vector);
+    	@signal [low_response_time];
+        @statistic [low_response_time_stat] (source="low_response_time"; record=mean, vector);
+        
+        @signal [high_jobs_num];
+        @statistic [high_jobs_num_stat] (source="high_jobs_num"; record=vector);
+    	
+    	@signal [high_response_time];
+        @statistic [high_response_time_stat] (source="high_response_time"; record=mean, vector);
     	
     gates:
         input queuesIn[];

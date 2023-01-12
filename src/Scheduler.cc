@@ -10,8 +10,14 @@ void Scheduler::initialize() {
     lowWait = false;
     logger = par("logger");
 
-    jobs_num_signal = registerSignal("jobs_num");
-    response_time_signal = registerSignal("response_time");
+    low_jobs_num_signal = registerSignal("low_jobs_num");
+    low_response_time_signal = registerSignal("low_response_time");
+
+    high_jobs_num_signal = registerSignal("high_jobs_num");
+    high_response_time_signal = registerSignal("high_response_time");
+
+    emit(low_jobs_num_signal, 0);
+    emit(high_jobs_num_signal, 0);
 }
 
 void Scheduler::handleMessage(cMessage *msg) {
@@ -81,6 +87,7 @@ void Scheduler::processHighJob(){
 }
 
 void Scheduler::removeHighJob(){
+    emit(high_response_time_signal, simTime() - highPriorityJob->getQueueArrival());
     highPriorityQueue.pop();
     if (logger) {
         EV << "scheduler: High priority job removed" << endl;
@@ -91,6 +98,7 @@ void Scheduler::removeHighJob(){
 }
 
 void Scheduler::removeLowJob(){
+    emit(low_response_time_signal, simTime() - lowPriorityJob->getQueueArrival());
     lowPriorityQueue.pop();
     if (logger) {
         EV << "scheduler: Low priority job removed" << endl;

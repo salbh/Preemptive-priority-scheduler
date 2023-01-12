@@ -18,8 +18,11 @@ class Scheduler : public cSimpleModule {
     Job* lowPriorityJob;
     Job* highPriorityJob;
 
-    simsignal_t jobs_num_signal = 0;
-    simsignal_t response_time_signal = 0;
+    simsignal_t low_jobs_num_signal = 0;
+    simsignal_t low_response_time_signal = 0;
+
+    simsignal_t high_jobs_num_signal = 0;
+    simsignal_t high_response_time_signal = 0;
 
     cMessage* processingTimerLow_;
     cMessage* processingTimerHigh_;
