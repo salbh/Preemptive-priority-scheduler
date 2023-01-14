@@ -6,3 +6,7 @@ out/gcc-release/src/Preemptive-priority-scheduler
 .settings/language.settings.xml
 .settings/language.settings.xml
 simulations/.qtenvrc
+.cproject
+.settings/language.settings.xml
+.settings/language.settings.xml
+src/Preemptive-priority-scheduler
