@@ -59,8 +59,10 @@ void Scheduler::handleJob(Job *job) {
             lowWait = false;
         }
         highPriorityQueue.push(job);
+        emit(high_jobs_num_signal, highPriorityQueue.size());
     } else {
         lowPriorityQueue.push(job);
+        emit(low_jobs_num_signal, lowPriorityQueue.size());
     }
     if (logger) {
         EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
@@ -89,6 +91,7 @@ void Scheduler::processHighJob(){
 void Scheduler::removeHighJob(){
     emit(high_response_time_signal, simTime() - highPriorityJob->getQueueArrival());
     highPriorityQueue.pop();
+    emit(high_jobs_num_signal, highPriorityQueue.size());
     if (logger) {
         EV << "scheduler: High priority job removed" << endl;
         EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
@@ -100,6 +103,7 @@ void Scheduler::removeHighJob(){
 void Scheduler::removeLowJob(){
     emit(low_response_time_signal, simTime() - lowPriorityJob->getQueueArrival());
     lowPriorityQueue.pop();
+    emit(low_jobs_num_signal, lowPriorityQueue.size());
     if (logger) {
         EV << "scheduler: Low priority job removed" << endl;
         EV << "scheduler: Low Priority Queue Size: " << lowPriorityQueue.size() << endl;
