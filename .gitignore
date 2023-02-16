@@ -1,10 +1,8 @@
-
-out/
 *.o
 *.d
-out/gcc-release/src/Preemptive-priority-scheduler
+Preemptive-Priority-Scheduler/out
 .settings/
-simulations/.qtenvrc
+Preemptive-Priority-Scheduler/simulations/.qtenvrc
 .cproject
-src/Preemptive-priority-scheduler
+Preemptive-Priority-Scheduler/src/Preemptive-priority-scheduler
 .computed/
