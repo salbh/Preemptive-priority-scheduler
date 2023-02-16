@@ -1,12 +1,10 @@
 
-out/gcc-release/src/.last-copts
+out/
 *.o
 *.d
 out/gcc-release/src/Preemptive-priority-scheduler
-.settings/language.settings.xml
-.settings/language.settings.xml
+.settings/
 simulations/.qtenvrc
 .cproject
-.settings/language.settings.xml
-.settings/language.settings.xml
 src/Preemptive-priority-scheduler
+.computed/
