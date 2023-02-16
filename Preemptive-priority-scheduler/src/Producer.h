@@ -11,9 +11,6 @@
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class Producer : public cSimpleModule {
     int arrivalDistribution = 0;
     int serviceDistribution = 0;
