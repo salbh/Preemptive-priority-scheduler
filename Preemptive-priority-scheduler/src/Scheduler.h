@@ -7,9 +7,6 @@
 
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
 class Scheduler : public cSimpleModule {
 
     std::queue <Job*> lowPriorityQueue;
