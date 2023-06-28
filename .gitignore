@@ -3,7 +3,6 @@
 Preemptive-Priority-Scheduler/out
 .settings/
 Preemptive-Priority-Scheduler/simulations/.qtenvrc
-.cproject
 Preemptive-Priority-Scheduler/src/Preemptive-priority-scheduler
 .computed/
 Preemptive-priority-scheduler/out/gcc-release/src/.last-copts
