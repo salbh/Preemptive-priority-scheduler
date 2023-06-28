@@ -53,7 +53,7 @@ void Scheduler::handleTimer(cMessage *msg) {
 }
 
 void Scheduler::handleJob(Job *job) {
-    if (job->getIsHighPriority()) {
+    if (job->isHighPriority()) {
         if (!lowPriorityQueue.empty()) {
             cancelEvent(processingTimerLow_);
             lowWait = false;
