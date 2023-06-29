@@ -52,9 +52,6 @@ void Producer::scheduleNextArrival() {
 
 void Producer::sendJob() {
     Job* job = new Job();
-    if (serviceDistribution == 0) {
-        job->setServiceTime(serviceMean);
-    }
     if (strcmp(getName(),"producerLow") == 0) {
         setJob(job, false, ST_LOW_RNG);
     } else {
@@ -68,7 +65,9 @@ void Producer::sendJob() {
 
 void Producer::setJob(Job *job, bool priority, const int RNG) {
     job->setIsHighPriority(priority);
-    if(serviceDistribution != 0) {
+    if (serviceDistribution == 0) {
+        job->setServiceTime(serviceMean);
+    } else {
         job->setServiceTime(exponential(serviceMean, RNG));
     }
 }
